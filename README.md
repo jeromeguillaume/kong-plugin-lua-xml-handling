@@ -97,10 +97,10 @@ Add ```xml-request-2-validate-xsd``` plugin and configure the plugin with:
 </xs:schema>
 ```
 
-Use request defined at step #3, **change** ```<soap:Envelope>``` by **```<soap:EnvelopeKong>```** and ```</soap:Envelope>``` by **```</soap:EnvelopeKong>```** => Kong says: 
+Use request defined at step #3, **change** ```<soap:Envelope>``` by **```<soap:EnvelopeKong>```** => Kong says: 
 ```xml
 <faultstring>
-XSD validation failed: Error code: 1845, Line: 2, Message: Element '{http://schemas.xmlsoap.org/soap/envelopeKong/}Envelope': No matching global declaration available for the validation root.
+XSD validation failed: Error code: 1845, Line: 2, Message: Element '{http://schemas.xmlsoap.org/soap/envelope/}EnvelopeKong': No matching global declaration available for the validation root.
 </faultstring>
 ```
 Use request defined at step #3, **remove ```<a>5</a>```** => there is an error because the ```<a>``` tag has the ```minOccurs="1"``` XSD property and Kong says: 
