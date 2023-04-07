@@ -73,7 +73,7 @@ The expected result is ```12```:
 ## How test XML Handling plugins with ```calcWebService/Calc.asmx```
 
 ### Example #2: Request | ```XSD VALIDATION```: calling incorrectly ```calcWebService``` and detecting issue in the Request with XSD schema
--Calling incorrectly ```calcWebService``` and detecting issue in the Request with XSD schema. 
+Calling incorrectly ```calcWebService``` and detecting issue in the Request with XSD schema. 
 We call incorrectly the Service by injecting a SOAP error; the plugin detects it, sends an error message to the Consumer and Kong doesn't call the SOAP backend API.
 
 Add ```xml-request-2-validate-xsd``` plugin and configure the plugin with:
