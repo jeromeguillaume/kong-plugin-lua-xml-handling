@@ -276,47 +276,45 @@ function xmlgeneral.RouteByXPath (kong, XMLtoSearch, XPath, XPathCondition)
   local ffi         = require("ffi")
   local libxml2ex   = require("kong.plugins.lua-xml-handling-lib.libxml2ex")
   local libxml2     = require("xmlua.libxml2")
+  local rcXpath     = false
   
-  kong.log.notice("XMLtoSearch: " .. XMLtoSearch)
-  kong.log.notice("xmlNewParserCtxt")
+  kong.log.notice("RouteByXPath, XMLtoSearch: " .. XMLtoSearch)
+
   local context = libxml2.xmlNewParserCtxt()
-  kong.log.notice("xmlCtxtReadMemory")
   local document = libxml2.xmlCtxtReadMemory(context, XMLtoSearch)
   if not document then
-    error({message = ffi.string(context.lastError.message)})
-  end
-  kong.log.notice("xmlXPathNewContext")
-  local context = libxml2.xmlXPathNewContext(document)
-  kong.log.notice("xmlXPathRegisterNs")
-  local rc = libxml2.xmlXPathRegisterNs(context, "soap", "http://schemas.xmlsoap.org/soap/envelope/")
-  if rc == false then
-    kong.log.err ("RouteByXPath, Unable to register the Path, rc: " .. tostring(rc))
-  end
-  kong.log.notice("xmlXPathRegisterNs")
-  rc = libxml2.xmlXPathRegisterNs(context, "tempui", "http://tempuri.org/")
-  if rc == false then
-    kong.log.err ("RouteByXPath, Unable to register the Path, rc: " .. tostring(rc))
+    -- error({message = ffi.string(context.lastError.message)})
+    kong.log.err ("RouteByXPath, xmlCtxtReadMemory error, no document")
   end
   
-  kong.log.notice("xmlXPathEvalExpression")
-  -- XPath = "/root/sub"
-  XPath =  "/soap:Envelope/soap:Body/Add"
+  local context = libxml2.xmlXPathNewContext(document)
+  
+  local rc = libxml2.xmlXPathRegisterNs(context, "soap", "http://schemas.xmlsoap.org/soap/envelope/")
+  
   local object = libxml2.xmlXPathEvalExpression(XPath, context)
   if object ~= ffi.NULL then
-    kong.log.notice("object.type: " .. tonumber(object.type))
-    --kong.log.notice("lastError.code: " .. context.lastError.code)
-    if object.nodesetval.nodeNr ~= 0 then
-      if object.nodesetval.nodeTab[0] ~= ffi.NULL then
-        kong.log.notice("libxml2.xmlNodeGetContent: " .. libxml2.xmlNodeGetContent(object.nodesetval.nodeTab[0]))
-      else
-        kong.log.err ("RouteByXPath, xmlNodeGetContent is null")  
-      end
+    
+    -- If we found the XPath element
+    if object.nodesetval ~= ffi.NULL and object.nodesetval.nodeNr ~= 0 then        
+        local nodeContent = libxml2.xmlNodeGetContent(object.nodesetval.nodeTab[0])
+        kong.log.notice("libxml2.xmlNodeGetContent: " .. nodeContent)
+        if nodeContent == XPathCondition then
+          rcXpath = true
+        end
     else
-      kong.log.err ("RouteByXPath, object.nodesetval.nodeNr is null")  
+      kong.log.err ("RouteByXPath, object.nodesetval is null")  
     end
   else
     kong.log.err ("RouteByXPath, object is null")
   end
+  local msg = "with XPath=\"" .. XPath .. "\" and XPathCondition=\"" .. XPathCondition .. "\""
+  
+  if rcXpath then
+    kong.log.notice ("RouteByXPath: Ok " .. msg)
+  else
+    kong.log.notice ("RouteByXPath: Ko " .. msg)
+  end
+  return rcXpath
 end
 
 return xmlgeneral

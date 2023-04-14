@@ -14,8 +14,14 @@ function plugin:access(plugin_conf)
   -- Get SOAP envelope from the request
   local soapEnvelope = kong.request.get_raw_body()
 
-  local attribute = xmlgeneral.RouteByXPath (kong, soapEnvelope, plugin_conf.XPath, plugin_conf.XPathCondition)
-
+  -- Get Route By Path and check if the condition is satisfied
+  local rcXpath = xmlgeneral.RouteByXPath (kong, soapEnvelope, plugin_conf.XPath, plugin_conf.XPathCondition)
+  -- If the condition is statsfied we change Upstream
+  if rcXpath then
+      kong.service.set_upstream(plugin_conf.RouteToUpstream)
+      kong.service.request.set_path(plugin_conf.RouteToPath)
+      kong.log.notice("Upstream changed successfully")
+  end
   --kong.log.notice("RouteByXPath: " .. attribute)
 end
   

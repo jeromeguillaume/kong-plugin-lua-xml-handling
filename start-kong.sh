@@ -1,6 +1,9 @@
 # remove the previous container
 docker rm -f kong-gateway-lua-xml-handling >/dev/null
 
+#--platform linux/arm64 \
+
+
 docker run -d --name kong-gateway-lua-xml-handling \
 --network=kong-net \
 --link kong-database-lua-xml-handling:kong-database-lua-xml-handling \
@@ -9,7 +12,6 @@ docker run -d --name kong-gateway-lua-xml-handling \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-3-transform-xslt-after,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-3-transform-xslt-after \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-4-route-by-xpath,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-4-route-by-xpath \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/lua-xml-handling-lib,destination=/usr/local/share/lua/5.1/kong/plugins/lua-xml-handling-lib \
---platform linux/arm64 \
 -e "KONG_DATABASE=postgres" \
 -e "KONG_PG_HOST=kong-database-lua-xml-handling" \
 -e "KONG_PG_USER=kong" \

@@ -51,7 +51,7 @@ Content-Type:"text/xml; charset=utf-8" \
 --raw "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">
   <soap:Body>
-    <Add xmlns:tempui=\"http://tempuri.org/\">
+    <Add xmlns=\"http://tempuri.org/\">
       <a>5</a>
       <b>7</b>
     </Add>
@@ -195,7 +195,7 @@ Add a Kong ```Upstream``` named ```websrv.cs.fsu.edu``` and defines a ```target`
 Add ```xml-request-4-route-by-xpath``` plugin and configure the plugin with:
 - ```RouteToPath``` property with the value ```/~engelen/calcserver.cgi```
 - ```RouteToUpstream```property with the value ```websrv.cs.fsu.edu```
-- ```XPath``` property with the value ```.//{http://tempuri.org/}a```
+- ```XPath``` property with the value ```/soap:Envelope/soap:Body/*[local-name() = 'add']/*[local-name() = 'a']```
 - ```XPathCondition``` property with the value ```5```
 
 Open ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
