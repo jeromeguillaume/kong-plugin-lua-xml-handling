@@ -167,7 +167,7 @@ Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin wit
         </xsl:copy>
     </xsl:template>   
     <xsl:template match="//*[local-name()='Subtract']">
-       <Add xmlns:tempui="http://tempuri.org/"><xsl:apply-templates select="@*|node()" /></Add>
+       <Add xmlns="http://tempuri.org/"><xsl:apply-templates select="@*|node()" /></Add>
    </xsl:template>
 </xsl:stylesheet>
 ```
