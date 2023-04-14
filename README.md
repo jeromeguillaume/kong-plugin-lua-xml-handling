@@ -137,15 +137,12 @@ XSLT transformation failed: Error code: 76, Line: 8, Message: Opening and ending
 Use request defined at step #3, **remove ```<a>5</a>```** => there is an error because the ```<a>``` tag has the ```minOccurs="1"``` XSD property and Kong says: 
 ```xml
 <faultstring>
-XSD validation failed: Error code: 1871, Line: 5, Message: Element '{http://tempuri.org/}b': This element is not expected. Expected is ( {http://tempuri.org/}a ).
+XSD validation failed: Error code: 1871, Line: 3, Message: Element '{http://tempuri.org/}Add': Missing child element(s). Expected is ( {http://tempuri.org/}a ).
 </faultstring>
 ```
 ### Example #3: Request | ```XSLT TRANSFORMATION - AFTER XSD```:  renaming a Tag in XML request by using XSLT
 The plugin applies a XSLT Transformation on XML request **after** the XSD Validation.
 In this example we **change the Tag name from ```<Subtract>...</Subtract>```** (present in the request) **to ```<Add>...</Add>```**.
-
-Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
-- ```XsltTransform``` property with no value
 
 **Without XSLT**: Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is ```-3```
 ```xml
@@ -157,6 +154,9 @@ Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin wit
   </soap:Body>
 </soap:Envelope>
 ```
+
+Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
+- ```XsltTransform``` property with no value
 
 Configure ```xml-request-3-transform-xslt-after``` plugin with:
 - ```XsltTransform``` property with this XSLT definition:

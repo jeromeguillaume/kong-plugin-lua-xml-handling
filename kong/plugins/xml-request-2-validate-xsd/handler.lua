@@ -28,7 +28,7 @@ function plugin:access(plugin_conf)
   end
   
   -- If the plugin is defined with XSD API schema
-  --[[if plugin_conf.xsdApiSchema then
+  if plugin_conf.xsdApiSchema then
   
     -- Validate the API XML (included in the <soap:envelope>) with its schema
     local errMessage, err = xmlgeneral.XMLValidateWithXSD (plugin_conf, 2, soapEnvelope, plugin_conf.xsdApiSchema)
@@ -37,7 +37,7 @@ function plugin:access(plugin_conf)
       return xmlgeneral.returnSoapFault (plugin_conf, xmlgeneral.HTTPCodeSOAPFault, "XSD validation failed", errMessage)
     end
   end
-]]
+  
 end
 
 return plugin
