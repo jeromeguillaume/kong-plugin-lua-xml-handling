@@ -6,4 +6,7 @@ ffi.cdef[[
                                 xmlNodePtr cur, 
                                 int level, 
                                 int format);
+    xmlChar *	xmlGetNoNsProp	(const xmlNode * node, 
+                                const xmlChar * name);
+           
 ]]

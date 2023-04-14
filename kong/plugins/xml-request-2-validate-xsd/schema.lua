@@ -1,16 +1,16 @@
 
 local typedefs = require "kong.db.schema.typedefs"
-local xmldef   = require("kong.plugins.lua-xml-handling.xmldef")
+local xmlgeneral   = require("kong.plugins.lua-xml-handling-lib.xmlgeneral")
 
 return {
-  name = "lua-xml-handling",
+  name = "xml-request-2-validate-xsd",
   fields = {
     { consumer = typedefs.no_consumer },
     { protocols = typedefs.protocols_http },
     { config = {
         type = "record",
         fields = {
-          { xsdSoapSchema = { type = "string", required = true, default = xmldef.jeg_XSD_SOAP }, },
+          { xsdSoapSchema = { type = "string", required = true, default = xmlgeneral.jeg_XSD_SOAP }, },
           { xsdApiSchema = { type = "string", required = false }, },
         },
     }, },
