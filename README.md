@@ -156,9 +156,6 @@ In this example we **change the Tag name from ```<Subtract>...</Subtract>```** (
 ```
 
 Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
-- ```XsltTransform``` property with no value
-
-Configure ```xml-request-3-transform-xslt-after``` plugin with:
 - ```XsltTransform``` property with this XSLT definition:
 ```xml
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
