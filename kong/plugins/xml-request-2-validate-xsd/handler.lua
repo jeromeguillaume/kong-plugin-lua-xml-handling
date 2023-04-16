@@ -19,9 +19,9 @@ function plugin:access(plugin_conf)
     -- Get SOAP envelope from the request
     local soapEnvelope = kong.request.get_raw_body()
     -- Validate the SOAP XML with its schema
-    local errMessage, err = xmlgeneral.XMLValidateWithXSD (plugin_conf, 0, soapEnvelope, plugin_conf.xsdSoapSchema)
+    local errMessage = xmlgeneral.XMLValidateWithXSD (plugin_conf, 0, soapEnvelope, plugin_conf.xsdSoapSchema)
     
-    if err ~= nil then
+    if errMessage ~= nil then
       -- Return a Fault code to Client
       return xmlgeneral.returnSoapFault (plugin_conf, xmlgeneral.HTTPCodeSOAPFault, "XSD validation failed", errMessage)
     end
@@ -31,8 +31,9 @@ function plugin:access(plugin_conf)
   if plugin_conf.xsdApiSchema then
   
     -- Validate the API XML (included in the <soap:envelope>) with its schema
-    local errMessage, err = xmlgeneral.XMLValidateWithXSD (plugin_conf, 2, soapEnvelope, plugin_conf.xsdApiSchema)
-    if err ~= nil then
+    local errMessage = xmlgeneral.XMLValidateWithXSD (plugin_conf, 2, soapEnvelope, plugin_conf.xsdApiSchema)
+    
+    if errMessage ~= nil then
       -- Return a Fault code to Client
       return xmlgeneral.returnSoapFault (plugin_conf, xmlgeneral.HTTPCodeSOAPFault, "XSD validation failed", errMessage)
     end

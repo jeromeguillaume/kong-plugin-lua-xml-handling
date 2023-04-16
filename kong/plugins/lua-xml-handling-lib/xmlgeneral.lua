@@ -2,7 +2,7 @@ local xmlgeneral = {}
 
 xmlgeneral.HTTPCodeSOAPFault = 500
 
-xmlgeneral.jeg_XSD_SOAP = [[
+xmlgeneral.XSD_SOAP = [[
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:tns="http://schemas.xmlsoap.org/soap/envelope/"
             targetNamespace="http://schemas.xmlsoap.org/soap/envelope/" >
@@ -81,39 +81,6 @@ xmlgeneral.jeg_XSD_SOAP = [[
   </xs:complexType>
 </xs:schema>
 ]]
-
-xmlgeneral.jeg_XSD_tempuri= [[
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="Add" type="tem:AddType" xmlns:tem="http://tempuri.org/"/>
-  <xs:complexType name="AddType">
-    <xs:sequence>
-      <xs:element type="xs:integer" name="a" minOccurs="1"/>
-      <xs:element type="xs:integer" name="b" minOccurs="1"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="Subtract" type="tem:SubtractType" xmlns:tem="http://tempuri.org/"/>
-  <xs:complexType name="SubtractType">
-    <xs:sequence>
-      <xs:element type="xs:integer" name="a" minOccurs="1"/>
-      <xs:element type="xs:integer" name="b" minOccurs="1"/>
-    </xs:sequence>
-  </xs:complexType>
-</xs:schema>
-]]
-
-xmlgeneral.jeg_XML= [[
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope2 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <Add xmlns="http://tempuri.org/">
-      <a>5</a>
-      <b>7</b>
-    </Add>
-  </soap:Body>
-</soap:Envelope2>
-]]
-
 ---------------------------------------
 -- Return a SOAP Fault to the Consumer
 ---------------------------------------
@@ -146,56 +113,70 @@ function xmlgeneral.XSLTransform(plugin_conf, XMLtoTransform, XSLT)
   local err         = nil
   local style       = nil
   local xml_doc     = nil
-  local xml_transformed_dump = ""
+  local errDump     = 0
+  local xml_transformed_dump  = ""
+  local xmlNodePtrRoot        = nil
   
   kong.log.notice("XSLT transformation, BEGIN: " .. XMLtoTransform)
 
-  local default_parse_options = bit.bor(ffi.C.XML_PARSE_RECOVER,
-                                        ffi.C.XML_PARSE_NOERROR,
+  local default_parse_options = bit.bor(ffi.C.XML_PARSE_NOERROR,
                                         ffi.C.XML_PARSE_NOWARNING,
                                         ffi.C.XML_PARSE_NONET)
                                         
   -- Load the XSLT document
-  local xslt_doc = libxml2ex.xmlReadMemory(XSLT, nil, nil, default_parse_options)
-  errMessage, err = libxml2ex.xmlGetLastError()
+  local xslt_doc, errMessage = libxml2ex.xmlReadMemory(XSLT, nil, nil, default_parse_options)
+  
+  if errMessage == nil then
 
-  if err == nil then
     -- Parse XSLT document
     style = libxslt.xsltParseStylesheetDoc (xslt_doc)
-    
-    -- Load the complete XML document (with <soap:Envelope>)
-    xml_doc = libxml2ex.xmlReadMemory(XMLtoTransform, nil, nil, default_parse_options)
-    
-    errMessage, err = libxml2ex.xmlGetLastError()
+    if style ~= nil then
+      -- Load the complete XML document (with <soap:Envelope>)
+      xml_doc, errMessage = libxml2ex.xmlReadMemory(XMLtoTransform, nil, nil, default_parse_options)
+    else
+      errMessage = "error calling 'xsltParseStylesheetDoc'"
+    end
+
   end
 
-  if err == nil then
+  -- If the XSLT and the XML are correctly loaded and parsed
+  if errMessage == nil then
     -- Transform the XML doc with XSLT transformation
     local xml_transformed = libxslt.xsltApplyStylesheet (style, xml_doc)
-
-    -- Get Root Element, which is <soap:Envelope>
-    local xmlNodePtrRoot   = libxml2.xmlDocGetRootElement(xml_transformed);
     
-    -- Dump into a String the XML transformed by XSLT
-    xml_transformed_dump = libxml2ex.xmlNodeDump	(xml_transformed, xmlNodePtrRoot, 1, 1)
+    if xml_transformed ~= nil then
+      -- Get Root Element, which is <soap:Envelope>
+      xmlNodePtrRoot = libxml2.xmlDocGetRootElement(xml_transformed)
+      if xmlNodePtrRoot == nil then
+        errMessage = "error calling 'xmlDocGetRootElement'"  
+      end
+    else
+      errMessage = "error calling 'xsltApplyStylesheet'"
+    end
 
-    -- Remove empty Namespace (example: xmlns="") added by XSLT library or transformation 
-    xml_transformed_dump = xml_transformed_dump:gsub(' xmlns=""', '')
-
-    errMessage, err = libxml2ex.xmlGetLastError()
-    
-    -- Dump into a String the XML transformed
-    kong.log.notice ("XSLT transformation, END: " .. xml_transformed_dump)
+    if xmlNodePtrRoot ~= nil then
+      -- Dump into a String the XML transformed by XSLT
+      xml_transformed_dump, errDump = libxml2ex.xmlNodeDump	(xml_transformed, xmlNodePtrRoot, 1, 1)
+      if errDump == 0 then
+        -- Remove empty Namespace (example: xmlns="") added by XSLT library or transformation 
+        xml_transformed_dump = xml_transformed_dump:gsub(' xmlns=""', '')
+        -- Dump into a String the XML transformed
+        kong.log.notice ("XSLT transformation, END: " .. xml_transformed_dump)
+      else
+        errMessage = "error calling 'xmlNodeDump'"
+      end
+    end
   end
   
-  if err ~= nil then
+  --if err ~= nil then
+  if errMessage ~= nil then
     kong.log.err ("XSLT transformation, errMessage: " .. errMessage)
   end
 
   -- xmlCleanupParser()
   -- xmlMemoryDump()
   
-  return xml_transformed_dump, errMessage, err
+  return xml_transformed_dump, errMessage
   
 end
 
@@ -203,28 +184,28 @@ end
 -- Validate a XML with its XSD schema
 --------------------------------------
 function xmlgeneral.XMLValidateWithXSD (plugin_conf, child, XMLtoValidate, XSDSchema)
-  local ffi         = require("ffi")
-  local libxml2ex   = require("kong.plugins.lua-xml-handling-lib.libxml2ex")
-  local libxml2     = require("xmlua.libxml2")
-  local errMessage  = ""
-  local err         = nil
+  local ffi           = require("ffi")
+  local libxml2ex     = require("kong.plugins.lua-xml-handling-lib.libxml2ex")
+  local libxml2       = require("xmlua.libxml2")
+  local errMessage    = nil
+  local err           = nil
+  local is_valid      = 0
   
   -- Create Parser Context
   local xsd_context = libxml2ex.xmlSchemaNewMemParserCtxt(XSDSchema)
-  -- context.lastError.message
   
   -- Create XSD schema
   local xsd_schema_doc, errMessage = libxml2ex.xmlSchemaParse(xsd_context)
-  errMessage, err = libxml2ex.xmlGetLastError()
-
-  if err == nil then
+  
+  -- If there is no error loading the XSD schema
+  if not errMessage then
     
     -- Create Validation context of XSD Schema
     local validation_context = libxml2ex.xmlSchemaNewValidCtxt(xsd_schema_doc)
     
-    -- Load the complete XML document (with <soap:Envelope>)
-    local xml_doc = libxml2ex.xmlReadMemory(XMLtoValidate, nil, nil, 1)
-
+    local default_parse_options = bit.bor(ffi.C.XML_PARSE_RECOVER)
+    local xml_doc = libxml2ex.xmlReadMemory(XMLtoValidate, nil, nil, default_parse_options )
+    
     -- if we have to find the 1st Child of API (and not the <soap> root)
     if child ~=0 then
       -- Example:
@@ -248,25 +229,27 @@ function xmlgeneral.XMLValidateWithXSD (plugin_conf, child, XMLtoValidate, XSDSc
       kong.log.notice ("XSD validation API part: " .. libxml2ex.xmlNodeDump	(xml_doc, xmlNodePtrChildWS, 1, 1))
 
       -- Check validity of One element with its XSD schema
-      local is_valid = libxml2ex.xmlSchemaValidateOneElement (validation_context, xmlNodePtrChildWS)
-      errMessage, err = libxml2ex.xmlGetLastError()
+      is_valid, errMessage = libxml2ex.xmlSchemaValidateOneElement (validation_context, xmlNodePtrChildWS)
     else
       -- Get Root Element, which is <soap:Envelope>
-      local xmlNodePtrRoot   = libxml2.xmlDocGetRootElement(xml_doc);
+      local xmlNodePtrRoot = libxml2.xmlDocGetRootElement(xml_doc);
       kong.log.notice ("XSD validation SOAP part: " .. libxml2ex.xmlNodeDump	(xml_doc, xmlNodePtrRoot, 1, 1))
 
       -- Check validity of XML with its XSD schema
-      local is_valid, errMessage = libxml2ex.xmlSchemaValidateDoc (validation_context, xml_doc)
-      errMessage, err = libxml2ex.xmlGetLastError()
+      is_valid, errMessage = libxml2ex.xmlSchemaValidateDoc (validation_context, xml_doc)
+      kong.log.notice ("is_valid: " .. is_valid)
     end
   end
   
-  if err == nil then
+  if not errMessage and is_valid == 0 then
     kong.log.notice ("XSD validation of SOAP schema: Ok")
-  else
+  elseif errMessage then
     kong.log.err ("XSD validation of SOAP schema: Ko, " .. errMessage)
+  else
+    errMessage = "Ko"
+    kong.log.err ("XSD validation of SOAP schema: ")
   end
-  return errMessage, err
+  return errMessage
 end
 
 ---------------------------------------------

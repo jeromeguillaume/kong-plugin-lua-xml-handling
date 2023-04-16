@@ -14,9 +14,9 @@ function plugin:access(plugin_conf)
   -- Get SOAP envelope from the request
   local soapEnvelope = kong.request.get_raw_body()
 
-  local soapEnvelope_transformed, errMessage, err = xmlgeneral.XSLTransform(plugin_conf, soapEnvelope, plugin_conf.xsltTransform)
+  local soapEnvelope_transformed, errMessage = xmlgeneral.XSLTransform(plugin_conf, soapEnvelope, plugin_conf.xsltTransform)
 
-  if err ~= nil then
+  if errMessage ~= nil then
     -- Return a Fault code to Client
     return xmlgeneral.returnSoapFault (plugin_conf, xmlgeneral.HTTPCodeSOAPFault, "XSLT transformation failed", errMessage)
   end

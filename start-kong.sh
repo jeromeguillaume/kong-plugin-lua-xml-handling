@@ -2,10 +2,12 @@
 docker rm -f kong-gateway-lua-xml-handling >/dev/null
 
 #--platform linux/arm64 \
+#-e "KONG_PLUGINS=bundled,xml-request-1-transform-xslt-before,xml-request-2-validate-xsd,xml-request-3-transform-xslt-after,xml-request-4-route-by-xpath" \
 
 
 docker run -d --name kong-gateway-lua-xml-handling \
 --network=kong-net \
+--platform linux/arm64 \
 --link kong-database-lua-xml-handling:kong-database-lua-xml-handling \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-1-transform-xslt-before,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-1-transform-xslt-before \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-2-validate-xsd,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-2-validate-xsd \
@@ -30,6 +32,8 @@ docker run -d --name kong-gateway-lua-xml-handling \
 -p 8001:8001 \
 -p 8002:8002 \
 -p 8444:8444 \
-kong/kong-gateway:3.2.2.1
+kong/kong-gateway:3.1.1.3-alpine
+
+#kong/kong-gateway:3.2.2.1
 
 echo 'docker logs kong-gateway-lua-xml-handling -f'

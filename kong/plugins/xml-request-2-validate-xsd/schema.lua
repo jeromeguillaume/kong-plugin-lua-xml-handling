@@ -10,7 +10,7 @@ return {
     { config = {
         type = "record",
         fields = {
-          { xsdSoapSchema = { type = "string", required = true, default = xmlgeneral.jeg_XSD_SOAP }, },
+          { xsdSoapSchema = { type = "string", required = true, default = xmlgeneral.XSD_SOAP }, },
           { xsdApiSchema = { type = "string", required = false }, },
         },
     }, },
