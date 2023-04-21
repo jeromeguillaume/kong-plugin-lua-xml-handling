@@ -1,5 +1,5 @@
 # Kong plugins: XML Handling
-It's a set of Kong plugins which are developed in Lua and uses the GNOME C libraries [libxml2](https://gitlab.gnome.org/GNOME/libxml2#libxml2) and [libxslt](https://gitlab.gnome.org/GNOME/libxslt#libxslt).
+It's a set of Kong plugins which are developed in Lua and use the GNOME C libraries [libxml2](https://gitlab.gnome.org/GNOME/libxml2#libxml2) and [libxslt](https://gitlab.gnome.org/GNOME/libxslt#libxslt).
 
 The plugins handle the XML **Request** and the XML **Response** in this order:
 
@@ -191,7 +191,7 @@ Note: the ```websrv.cs.fsu.edu``` introduces a new XML NameSpace so we have to c
 Add a Kong ```Upstream``` named ```websrv.cs.fsu.edu``` and defines a ```target```with ```websrv.cs.fsu.edu:443``` value. 
 Add ```xml-request-4-route-by-xpath``` plugin and configure the plugin with:
 - ```RouteToPath``` property with the value ```/~engelen/calcserver.cgi```
-- ```RouteToUpstream```property with the value ```websrv.cs.fsu.edu```
+- ```RouteToUpstream``` property with the value ```websrv.cs.fsu.edu```
 - ```XPath``` property with the value ```/soap:Envelope/soap:Body/*[local-name() = 'add']/*[local-name() = 'a']```
 - ```XPathCondition``` property with the value ```5```
 

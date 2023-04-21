@@ -2,6 +2,12 @@ local xmlgeneral = {}
 
 xmlgeneral.HTTPCodeSOAPFault = 500
 
+xmlgeneral.RequestTextError   = "Request"
+xmlgeneral.ResponseTextError  = "Response"
+xmlgeneral.SepTextError       = " - "
+xmlgeneral.XSLTError          = "XSLT transformation failed"
+xmlgeneral.XSDError           = "XSD validation failed"
+
 xmlgeneral.XSD_SOAP = [[
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:tns="http://schemas.xmlsoap.org/soap/envelope/"
@@ -81,13 +87,14 @@ xmlgeneral.XSD_SOAP = [[
   </xs:complexType>
 </xs:schema>
 ]]
----------------------------------------
--- Return a SOAP Fault to the Consumer
----------------------------------------
-function xmlgeneral.returnSoapFault(plugin_conf, HTTPcode, ErrMsg, ErrEx)
+
+---------------------------------
+-- Format the SOAP Fault message
+---------------------------------
+function xmlgeneral.formatSoapFault(ErrMsg, ErrEx)
   local soapErrMsg = "\
-  <?xml version=\"1.0\" encoding=\"utf-8\"?> \
-  <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> \
+<?xml version=\"1.0\" encoding=\"utf-8\"?> \
+<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> \
   <soap:Body> \
     <soap:Fault>\
       <faultcode>soap:Client</faultcode>\
@@ -97,7 +104,18 @@ function xmlgeneral.returnSoapFault(plugin_conf, HTTPcode, ErrMsg, ErrEx)
   </soap:Body>\
 </soap:Envelope>\
 "
-  kong.log.err ("returnSoapFault, soapErrMsg:" .. soapErrMsg)
+  kong.log.err ("formatSoapFault, soapErrMsg:" .. soapErrMsg)
+  return soapErrMsg
+end
+
+---------------------------------------
+-- Return a SOAP Fault to the Consumer
+---------------------------------------
+function xmlgeneral.returnSoapFault(plugin_conf, HTTPcode, ErrMsg, ErrEx)
+  -- Format the SOAP Fault message
+  local soapErrMsg = xmlgeneral.formatSoapFault(ErrMsg, ErrEx)
+  kong.response.set_header ("X-Fault-Code", "on")
+  -- Sends a Fault code to client
   return kong.response.exit(HTTPcode, soapErrMsg, {["Content-Type"] = "text/xml; charset=utf-8"})
 end
 

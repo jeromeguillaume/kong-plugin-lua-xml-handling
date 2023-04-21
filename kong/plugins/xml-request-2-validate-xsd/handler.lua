@@ -11,19 +11,22 @@ function plugin:access(plugin_conf)
 
   local xmlgeneral = require("kong.plugins.lua-xml-handling-lib.xmlgeneral")
   
+  -- Enables buffered proxying (due to 'xml-response-1-transform-xslt-before' plugin)
+  -- kong.service.request.enable_buffering()
   -- Get SOAP envelope from the request
   local soapEnvelope = kong.request.get_raw_body()
   
   -- If the plugin is defined with XSD SOAP schema
   if plugin_conf.xsdSoapSchema then
-    -- Get SOAP envelope from the request
-    local soapEnvelope = kong.request.get_raw_body()
     -- Validate the SOAP XML with its schema
     local errMessage = xmlgeneral.XMLValidateWithXSD (plugin_conf, 0, soapEnvelope, plugin_conf.xsdSoapSchema)
     
     if errMessage ~= nil then
       -- Return a Fault code to Client
-      return xmlgeneral.returnSoapFault (plugin_conf, xmlgeneral.HTTPCodeSOAPFault, "XSD validation failed", errMessage)
+      return xmlgeneral.returnSoapFault (plugin_conf, 
+                                        xmlgeneral.HTTPCodeSOAPFault, 
+                                        xmlgeneral.RequestTextError .. xmlgeneral.SepTextError .. xmlgeneral.XSDError, 
+                                        errMessage)
     end
   end
   
@@ -35,10 +38,13 @@ function plugin:access(plugin_conf)
     
     if errMessage ~= nil then
       -- Return a Fault code to Client
-      return xmlgeneral.returnSoapFault (plugin_conf, xmlgeneral.HTTPCodeSOAPFault, "XSD validation failed", errMessage)
+      return xmlgeneral.returnSoapFault (plugin_conf, 
+                                        xmlgeneral.HTTPCodeSOAPFault, 
+                                        xmlgeneral.RequestTextError .. xmlgeneral.SepTextError .. xmlgeneral.XSDError, 
+                                        errMessage)
     end
   end
-  
+
 end
 
 return plugin
