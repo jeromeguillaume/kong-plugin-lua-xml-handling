@@ -230,7 +230,7 @@ In this example the XSLT **changes the Tag names**:
 -  from ```<result>...</result>``` (present in the response) to **```<KongResult>...</KongResult>```**
 
 Add ```xml-response-1-transform-xslt-before``` plugin and configure the plugin with:
-- ```XsltTransform``` property with this XSLT definition:
+- ```XsltTransformBefore``` property with this XSLT definition:
 ```xml
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:template match="@*|node()">
