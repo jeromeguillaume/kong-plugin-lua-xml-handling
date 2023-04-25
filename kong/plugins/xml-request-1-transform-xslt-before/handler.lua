@@ -1,6 +1,6 @@
 -- handler.lua
 local plugin = {
-    PRIORITY = 50,
+    PRIORITY = 75,
     VERSION = "1.0.0",
   }
 
@@ -9,19 +9,18 @@ local plugin = {
 ---------------------------------------------------------------------------------------------------
 function plugin:access(plugin_conf)
 
-  -- Enables buffered proxying (due to 'xml-response-1-transform-xslt-before' plugin)
-  -- kong.service.request.enable_buffering()
-
   local xmlgeneral = require("kong.plugins.lua-xml-handling-lib.xmlgeneral")
   
   -- Get SOAP envelope from the request
   local soapEnvelope = kong.request.get_raw_body()
 
+  -- Apply XLST Transformation
   local soapEnvelope_transformed, errMessage = xmlgeneral.XSLTransform(plugin_conf, soapEnvelope, plugin_conf.xsltTransform)
 
   if errMessage ~= nil then
     -- Return a Fault code to Client
-    return xmlgeneral.returnSoapFault (plugin_conf,
+    return xmlgeneral.returnSoapFault (plugin.PRIORITY,
+                                      plugin_conf,
                                       xmlgeneral.HTTPCodeSOAPFault,
                                       xmlgeneral.RequestTextError .. xmlgeneral.SepTextError .. xmlgeneral.XSLTError,
                                       errMessage)

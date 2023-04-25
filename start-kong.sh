@@ -15,6 +15,7 @@ docker run -d --name kong-gateway-lua-xml-handling \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-4-route-by-xpath,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-4-route-by-xpath \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-response-1-transform-xslt-before,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-1-transform-xslt-before \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-response-2-validate-xsd,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-2-validate-xsd \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-response-3-transform-xslt-after,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-3-transform-xslt-after \
 --mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/lua-xml-handling-lib,destination=/usr/local/share/lua/5.1/kong/plugins/lua-xml-handling-lib \
 -e "KONG_DATABASE=postgres" \
 -e "KONG_PG_HOST=kong-database-lua-xml-handling" \
@@ -26,7 +27,7 @@ docker run -d --name kong-gateway-lua-xml-handling \
 -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
 -e "KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl" \
 -e "KONG_ADMIN_GUI_URL=http://localhost:8002" \
--e "KONG_PLUGINS=bundled,xml-request-1-transform-xslt-before,xml-request-2-validate-xsd,xml-request-3-transform-xslt-after,xml-request-4-route-by-xpath,xml-response-1-transform-xslt-before,xml-response-2-validate-xsd" \
+-e "KONG_PLUGINS=bundled,xml-request-1-transform-xslt-before,xml-request-2-validate-xsd,xml-request-3-transform-xslt-after,xml-request-4-route-by-xpath,xml-response-1-transform-xslt-before,xml-response-2-validate-xsd,xml-response-3-transform-xslt-after" \
 -e KONG_LICENSE_DATA \
 -e "KONG_NGINX_WORKER_PROCESSES=1" \
 -p 8000:8000 \

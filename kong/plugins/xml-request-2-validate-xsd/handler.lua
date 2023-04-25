@@ -1,6 +1,6 @@
 -- handler.lua
 local plugin = {
-    PRIORITY = 45,
+    PRIORITY = 74,
     VERSION = "1.0.0",
   }
 
@@ -23,7 +23,8 @@ function plugin:access(plugin_conf)
     
     if errMessage ~= nil then
       -- Return a Fault code to Client
-      return xmlgeneral.returnSoapFault (plugin_conf, 
+      return xmlgeneral.returnSoapFault (plugin.PRIORITY,
+                                        plugin_conf, 
                                         xmlgeneral.HTTPCodeSOAPFault, 
                                         xmlgeneral.RequestTextError .. xmlgeneral.SepTextError .. xmlgeneral.XSDError, 
                                         errMessage)
@@ -38,7 +39,8 @@ function plugin:access(plugin_conf)
     
     if errMessage ~= nil then
       -- Return a Fault code to Client
-      return xmlgeneral.returnSoapFault (plugin_conf, 
+      return xmlgeneral.returnSoapFault (plugin.PRIORITY,
+                                        plugin_conf, 
                                         xmlgeneral.HTTPCodeSOAPFault, 
                                         xmlgeneral.RequestTextError .. xmlgeneral.SepTextError .. xmlgeneral.XSDError, 
                                         errMessage)

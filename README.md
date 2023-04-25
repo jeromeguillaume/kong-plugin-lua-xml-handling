@@ -16,8 +16,7 @@ The plugins handle the XML **Request** and the XML **Response** in this order:
 6) ```XSD VALIDATION```: Validate the XML response against its XSD schema
 7) ```XSLT TRANSFORMATION - AFTER XSD```:  Transform the XML response after step #6
 
-Each handling is optional, except the ```XSLT TRANSFORMATION - AFTER XSD``` of the Response.
-In case of misconfiguration the Plugin sends to the consumer an HTTP 500 Internal Server Error ```<soap:Fault>``` (with the error detailed message)
+Each handling is optional. In case of misconfiguration the Plugin sends to the consumer an HTTP 500 Internal Server Error ```<soap:Fault>``` (with the error detailed message)
 
 ![Alt text](/images/Pipeline-Kong-xml-handling.png?raw=true "Kong - XML execution pipeline")
 
@@ -156,7 +155,7 @@ In this example we **change the Tag name from ```<Subtract>...</Subtract>```** (
 ```
 
 Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
-- ```XsltTransform``` property with this XSLT definition:
+- ```XsltTransformBefore``` property with this XSLT definition:
 ```xml
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output omit-xml-declaration="yes" indent="yes"/>
@@ -223,4 +222,95 @@ Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subt
     </ns:addResponse>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
+```
+### Example #5: Response | ```XSLT TRANSFORMATION - BEFORE XSD```: changing a Tag name in XML response by using XSLT
+The plugin applies a XSLT Transformation on XML response **before** the XSD Validation.
+In this example the XSLT **changes the Tag names**:
+-  from ```<ns:addResponse>...</ns:addResponse>``` (present in the response) to **```<addResponse>...</addResponse>```**
+-  from ```<result>...</result>``` (present in the response) to **```<KongResult>...</KongResult>```**
+
+Add ```xml-response-1-transform-xslt-before``` plugin and configure the plugin with:
+- ```XsltTransform``` property with this XSLT definition:
+```xml
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="//*[local-name()='addResponse']">
+    <addResponse>
+      <xsl:apply-templates select="@*|node()" />
+    </addResponse>
+  </xsl:template>
+  <xsl:template match="//*[local-name()='result']">
+    <KongResult><xsl:apply-templates select="@*|node()" /></KongResult>
+  </xsl:template>
+</xsl:stylesheet>
+```
+Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is ```<KongResult>13</KongResult>```:
+```xml
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" ... xmlns:ns="urn:calc">
+  <SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <addResponse>
+      <KongResult>13</KongResult>
+    </addResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+```
+### Example #6: Response | ```XSD VALIDATION```: checking validity of XML response against its XSD schema
+Add ```xml-response-2-validate-xsd``` plugin and configure the plugin with:
+- ```XsdApiSchema``` property with this value:
+```xml
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="addResponse" type="addResponseType"/>
+  <xs:complexType name="addResponseType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="KongResult"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+```
+### Example #7: Response | ```XSLT TRANSFORMATION - AFTER XSD```:  transforming the SOAP response to a XML response
+In this example the XSLT removes all <soap> tags and **converts the response from SOAP to XML**.
+
+Add ```xml-response-3-transform-xslt-after``` plugin and configure the plugin with:
+- ```XsltTransformAfter``` property with this value:
+```xml
+<xsl:stylesheet version="1.0" 
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+exclude-result-prefixes="soapenv">
+
+<xsl:strip-space elements="*"/>
+<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+
+<!-- remove all elements in the soapenv namespace -->
+<xsl:template match="soapenv:*">
+    <xsl:apply-templates select="node()"/>
+</xsl:template>
+
+<!-- for the remaining elements (i.e. elements in the default namespace) ... -->
+<xsl:template match="*">
+    <!-- ... create a new element with similar name in no-namespace -->
+    <xsl:element name="{local-name()}">
+        <xsl:apply-templates select="@*|node()"/>
+    </xsl:element>
+</xsl:template>
+
+<!-- convert attributes to elements -->
+<xsl:template match="@*">
+    <xsl:element name="{local-name()}">
+        <xsl:value-of select="." />
+    </xsl:element>
+</xsl:template>
+
+</xsl:stylesheet>
+```
+Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<addResponse>
+  <KongResult>13</KongResult>
+</addResponse>
 ```

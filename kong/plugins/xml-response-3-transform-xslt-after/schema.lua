@@ -3,14 +3,14 @@ local typedefs = require "kong.db.schema.typedefs"
 local xmlgeneral   = require("kong.plugins.lua-xml-handling-lib.xmlgeneral")
 
 return {
-  name = "xml-response-1-transform-xslt-before",
+  name = "xml-response-3-transform-xslt-after",
   fields = {
     { consumer = typedefs.no_consumer },
     { protocols = typedefs.protocols_http },
     { config = {
         type = "record",
         fields = {
-          { xsltTransformBefore = { type = "string", required = true }, },
+          { xsltTransformAfter = { type = "string", required = true }, },
         },
     }, },
   },

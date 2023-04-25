@@ -1,6 +1,6 @@
 -- handler.lua
 local plugin = {
-    PRIORITY = 35,
+    PRIORITY = 72,
     VERSION = "1.0.0",
   }
 

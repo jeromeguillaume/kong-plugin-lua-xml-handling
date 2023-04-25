@@ -111,10 +111,18 @@ end
 ---------------------------------------
 -- Return a SOAP Fault to the Consumer
 ---------------------------------------
-function xmlgeneral.returnSoapFault(plugin_conf, HTTPcode, ErrMsg, ErrEx)
+function xmlgeneral.returnSoapFault(priority, plugin_conf, HTTPcode, ErrMsg, ErrEx)
   -- Format the SOAP Fault message
   local soapErrMsg = xmlgeneral.formatSoapFault(ErrMsg, ErrEx)
-  kong.response.set_header ("X-Fault-Code", "on")
+  
+  -- Set the a Global Fault Code to Request and Response XLM/SOAP plugins 
+  -- It prevents to apply XML/SOAP handling whereas there is already an error
+  kong.ctx.shared.xmlSoapHandlingFault = {
+    error = true,
+    priority = priority,
+    soapEnvelope = soapErrMsg
+  }
+  
   -- Sends a Fault code to client
   return kong.response.exit(HTTPcode, soapErrMsg, {["Content-Type"] = "text/xml; charset=utf-8"})
 end
