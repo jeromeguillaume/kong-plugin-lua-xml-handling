@@ -309,7 +309,6 @@ exclude-result-prefixes="soapenv">
 ```
 Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is:
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
 <addResponse>
   <KongResult>13</KongResult>
 </addResponse>
