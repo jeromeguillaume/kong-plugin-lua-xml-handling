@@ -127,16 +127,16 @@ Add ```xml-request-2-validate-xsd``` plugin and configure the plugin with:
 </xs:schema>
 ```
 
-Use request defined at step #3, **change** ```<soap:Envelope>``` by **```<soap:EnvelopeKong>```** => Kong says: 
+Use request defined at step #3, **change** ```<soap:Envelope>``` by **```<soap:EnvelopeKong>```**  and **change** ```</soap:Envelope>``` by **```</soap:EnvelopeKong>```** => Kong says: 
 ```xml
 <faultstring>
-XSLT transformation failed: Error code: 76, Line: 8, Message: Opening and ending tag mismatch: EnvelopeKong line 2 and Envelope
+Request - XSD validation failed: Error code: 1845, Line: 1, Message: Element '{http://schemas.xmlsoap.org/soap/envelope/}EnvelopeKong': No matching global declaration available for the validation root.
 </faultstring>
 ```
 Use request defined at step #3, **remove ```<a>5</a>```** => there is an error because the ```<a>``` tag has the ```minOccurs="1"``` XSD property and Kong says: 
 ```xml
 <faultstring>
-XSD validation failed: Error code: 1871, Line: 3, Message: Element '{http://tempuri.org/}Add': Missing child element(s). Expected is ( {http://tempuri.org/}a ).
+Request - XSD validation failed: Error code: 1871, Line: 3, Message: Element '{http://tempuri.org/}Subtract': Missing child element(s). Expected is ( {http://tempuri.org/}a ).
 </faultstring>
 ```
 ### Example #3: Request | ```XSLT TRANSFORMATION - AFTER XSD```:  renaming a Tag in XML request by using XSLT
