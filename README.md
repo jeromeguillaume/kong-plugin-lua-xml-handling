@@ -195,7 +195,7 @@ Add ```xml-request-4-route-by-xpath``` plugin and configure the plugin with:
 - ```XPathCondition``` property with the value ```5```
 
 Open ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
-- ```XsltTransform``` property with this XSLT definition:
+- ```XsltTransforAfter``` property with this XSLT definition:
 ```xml
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output omit-xml-declaration="yes" indent="yes"/>
