@@ -143,7 +143,7 @@ XSD validation failed: Error code: 1871, Line: 3, Message: Element '{http://temp
 The plugin applies a XSLT Transformation on XML request **after** the XSD Validation.
 In this example we **change the Tag name from ```<Subtract>...</Subtract>```** (present in the request) **to ```<Add>...</Add>```**.
 
-**Without XSLT**: Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is ```-3```
+**Without XSLT**: Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>```, remove <b>7</b>, the expected result is ```-3```
 ```xml
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" ...>
   <soap:Body>
@@ -210,7 +210,7 @@ Open ```xml-request-3-transform-xslt-after``` plugin and configure the plugin wi
    </xsl:template>
 </xsl:stylesheet>
 ```
-Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>```. The expected result is ```13```. The new Route (to ```websrv.cs.fsu.edu```) sends a slightly different response:
+Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` and remove <b>7</b>. The expected result is ```13```. The new Route (to ```websrv.cs.fsu.edu```) sends a slightly different response:
 - SOAP tag are in capital letter: ```<SOAP-ENV:Envelope>``` instead of ```<soap:Envelope>```
 - Namespace is injected: ```xmlns:ns="urn:calc"```
 ```xml
@@ -248,7 +248,7 @@ Add ```xml-response-1-transform-xslt-before``` plugin and configure the plugin w
   </xsl:template>
 </xsl:stylesheet>
 ```
-Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is ```<KongResult>13</KongResult>```:
+Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>```and remove <b>7</b> the expected result is ```<KongResult>13</KongResult>```:
 ```xml
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" ... xmlns:ns="urn:calc">
   <SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -307,7 +307,7 @@ exclude-result-prefixes="soapenv">
 
 </xsl:stylesheet>
 ```
-Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` the expected result is:
+Use request defined at step #3, rename the Tag ```<Add>...</Add>```, to ```<Subtract>...</Subtract>``` and remove <b>7</b> the expected result is:
 ```xml
 <addResponse>
   <KongResult>13</KongResult>
