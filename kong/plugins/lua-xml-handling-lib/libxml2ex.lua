@@ -15,40 +15,12 @@ if not loaded then
   end
 end
 
-local function __xmlParserVersionIsAvailable()
-    local success, err = pcall(function()
-        local func = xml2.__xmlParserVersion
-    end)
-    return success
-  end
-  
-
-local xmlParserVersion
-if __xmlParserVersionIsAvailable() then
-  xmlParserVersion = xml2.__xmlParserVersion()[0]
-else
-  xmlParserVersion = xml2.xmlParserVersion
-end
-
-libxml2ex.VERSION = ffi.string(xmlParserVersion)
-libxml2ex.XML_SAX2_MAGIC = 0xDEEDBEAF
-
-local function __xmlParserVersionIsAvailable()
-  local success, err = pcall(function()
-      local func = xml2.__xmlParserVersion
-  end)
-  return success
-end
-
-function libxml2ex.libxml2Version()
-    return ffi.string(xmlParserVersion)
-end
-
 -- Create an XML Schemas parse context for that memory buffer expected to contain an XML Schemas file.
 -- buffer:	a pointer to a char array containing the schemas
 -- size:	the size of the array
 -- Returns:	the parser context or NULL in case of error
 function libxml2ex.xmlSchemaNewMemParserCtxt (xsd_schema)
+    
     local xsd_context = xml2.xmlSchemaNewMemParserCtxt(xsd_schema, #xsd_schema)
     
     if xsd_context == ffi.NULL then
@@ -114,13 +86,9 @@ function libxml2ex.xmlReadMemory (xml_document, base_url_document, document_enco
   local errMessage
   
   local error_handler = ffi.cast("xmlStructuredErrorFunc", function(userdata, xmlError)
-      ngx.log(ngx.ERR, "/*/*/ Error in xmlReadMemory")
       errMessage = libxml2ex.formatErrMsg(xmlError)
-      ngx.log(ngx.ERR, "/*/*/ Error in xmlReadMemory, errMessage: " .. errMessage)
-
     end)
   xml2.xmlSetStructuredErrorFunc(nil, error_handler)
-  
   ffi.gc(error_handler, error_handler.free)
 
   local xml_doc = xml2.xmlReadMemory (xml_document, #xml_document, base_url_document, document_encoding, options)
@@ -167,35 +135,6 @@ function libxml2ex.xmlSchemaValidateOneElement	(validation_context, xmlNodePtr)
   return tonumber(is_valid), errMessage
 end
 
--- Get the last parsing error registered.
--- ctx:	an XML parser context
--- Returns:	NULL if no error occurred or a pointer to the error
-function libxml2ex.xmlCtxtGetLastError (ctx)
-  local errMessage = ""
-  local xmlError = xml2.xmlCtxtGetLastError(ctx)
-  if xmlError ~= ffi.NULL then
-
-    local xmlErrorMsg = ffi.string(xmlError.message)
-    -- If the last character is Return Line
-    if xmlErrorMsg:sub(-1) == '\n' then
-      -- Remove the Return Line
-      xmlErrorMsg = xmlErrorMsg:sub(1, -2)
-    end
-    if xmlError.ctxt ~= ffi.NULL then
-      ngx.log(ngx.NOTICE, "xmlError.ctxt is not null")
-    end
-    
-    errMessage =  "Error code: "  .. tonumber(xmlError.code) ..
-                  ", Line: "      .. tonumber(xmlError.line) ..
-                  ", Message: "   .. xmlErrorMsg
-    
-  else
-    ngx.log(ngx.NOTICE, "No error message, xmlCtxtGetLastError is null")
-    xmlError = nil
-  end
-  return errMessage, xmlError
-end
-
 -- Format the Error Message
 function libxml2ex.formatErrMsg(xmlError)
 
@@ -211,9 +150,11 @@ function libxml2ex.formatErrMsg(xmlError)
                       ", Message: "   .. xmlErrorMsg
   return errMessage
 end
+
 -- Get the last parsing error registered
 -- ctx:	an XML parser context
 -- Returns:	NULL if no error occurred or a pointer to the error
+-- **** DON'T USE THIS FUNCTION: it returns a global variable Error and it's for the nginx multi-treaded processing 
 function libxml2ex.xmlGetLastError ()
   local errMessage = ""
   local xmlError = xml2.xmlGetLastError()

@@ -13,6 +13,7 @@ return {
           { RouteToUpstream = { type = "string", required = true }, },
           { XPath = { type = "string", required = true }, },
           { XPathCondition = { type = "string", required = true }, },
+          { XPathRegisterNs = { type = "array",  required = true, elements = {type = "string", required = true}, default = {"soap,http://schemas.xmlsoap.org/soap/envelope/"}},},
         },
     }, },
   },

@@ -232,7 +232,7 @@ function xmlgeneral.XMLValidateWithXSD (plugin_conf, child, XMLtoValidate, XSDSc
     local default_parse_options = bit.bor(ffi.C.XML_PARSE_RECOVER)
     local xml_doc = libxml2ex.xmlReadMemory(XMLtoValidate, nil, nil, default_parse_options )
     
-    -- if we have to find the 1st Child of API (and not the <soap> root)
+    -- if we have to find the 1st Child of API which is this example <Add ... /"> (and not the <soap> root)
     if child ~=0 then
       -- Example:
       -- <soap:Envelope xmlns:xsi=....">
@@ -281,7 +281,7 @@ end
 ---------------------------------------------
 -- Search a XPath and Compares it to a value
 ---------------------------------------------
-function xmlgeneral.RouteByXPath (kong, XMLtoSearch, XPath, XPathCondition)
+function xmlgeneral.RouteByXPath (kong, XMLtoSearch, XPath, XPathCondition, XPathRegisterNs)
   local ffi         = require("ffi")
   local libxml2ex   = require("kong.plugins.lua-xml-handling-lib.libxml2ex")
   local libxml2     = require("xmlua.libxml2")
@@ -292,14 +292,34 @@ function xmlgeneral.RouteByXPath (kong, XMLtoSearch, XPath, XPathCondition)
   local context = libxml2.xmlNewParserCtxt()
   local document = libxml2.xmlCtxtReadMemory(context, XMLtoSearch)
   if not document then
-    -- error({message = ffi.string(context.lastError.message)})
     kong.log.err ("RouteByXPath, xmlCtxtReadMemory error, no document")
   end
   
   local context = libxml2.xmlXPathNewContext(document)
   
-  local rc = libxml2.xmlXPathRegisterNs(context, "soap", "http://schemas.xmlsoap.org/soap/envelope/")
+  -- Register NameSpace(s)
+  kong.log.notice("XPathRegisterNs length: " .. #XPathRegisterNs)
   
+  -- Go on each NameSpace definition
+  for i = 1, #XPathRegisterNs do
+    local prefix, uri
+    local j = XPathRegisterNs[i]:find(',', 1)
+    if j then
+      prefix  = string.sub(XPathRegisterNs[i], 1, j - 1)
+      uri     = string.sub(XPathRegisterNs[i], j + 1, #XPathRegisterNs[i])
+    end
+    local rc = false
+    if prefix and uri then
+      -- Register NameSpace
+      rc = libxml2.xmlXPathRegisterNs(context, prefix, uri)
+    end
+    if rc then
+      kong.log.notice("RouteByXPath, successful registering NameSpace for '" .. XPathRegisterNs[i] .. "'")
+    else
+      kong.log.err("RouteByXPath, failure registering NameSpace for '" .. XPathRegisterNs[i] .. "'")
+    end
+  end
+
   local object = libxml2.xmlXPathEvalExpression(XPath, context)
   if object ~= ffi.NULL then
     

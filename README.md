@@ -181,7 +181,7 @@ Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin wit
 </soap:Envelope>
 ```
 ### Example #4: Request | ```ROUTING BY XPATH```: change the Route of the request to a different hostname and path depending of XPath condition
-The plugin searches the XPath entry and compares it to a Condition value. If this is the right Condition value, the plugin changes the host and the path of the Route. 
+The plugin searches the XPath entry and compares it to a Condition value. If this is the right Condition value, the plugin changes the host and the path of the Route.
 
 This example uses a new backend Web Service (https://websrv.cs.fsu.edu/~engelen/calc.wsdl) which provides the same capabilities as ```calcWebService``` Service (https://ecs.syr.edu) defined at step #1. 
 
@@ -193,6 +193,7 @@ Add ```xml-request-4-route-by-xpath``` plugin and configure the plugin with:
 - ```RouteToUpstream``` property with the value ```websrv.cs.fsu.edu```
 - ```XPath``` property with the value ```/soap:Envelope/soap:Body/*[local-name() = 'add']/*[local-name() = 'a']```
 - ```XPathCondition``` property with the value ```5```
+- ```XPathRegisterNs``` leave the default value; we can register specific NameSpace with the syntax ```prefix,uri```
 
 Open ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
 - ```XsltTransforAfter``` property with this XSLT definition:
