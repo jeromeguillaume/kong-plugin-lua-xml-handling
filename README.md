@@ -76,7 +76,7 @@ The plugin applies a XSLT Transformation on XML request **before** the XSD Valid
 In this example the XSLT **adds the value ```<b>8</b>```** that will be not present in the request.
 
 Add ```xml-request-1-transform-xslt-before``` plugin and configure the plugin with:
-- ```XsltTransform``` property with this XSLT definition:
+- ```XsltTransformBefore``` property with this XSLT definition:
 ```xml
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output omit-xml-declaration="yes" indent="yes"/>
@@ -155,7 +155,7 @@ In this example we **change the Tag name from ```<Subtract>...</Subtract>```** (
 ```
 
 Add ```xml-request-3-transform-xslt-after``` plugin and configure the plugin with:
-- ```XsltTransformBefore``` property with this XSLT definition:
+- ```XsltTransformAfter``` property with this XSLT definition:
 ```xml
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output omit-xml-declaration="yes" indent="yes"/>

@@ -144,7 +144,7 @@ function xmlgeneral.XSLTransform(plugin_conf, XMLtoTransform, XSLT)
   local xmlNodePtrRoot        = nil
   
   kong.log.notice("XSLT transformation, BEGIN: " .. XMLtoTransform)
-
+  
   local default_parse_options = bit.bor(ffi.C.XML_PARSE_NOERROR,
                                         ffi.C.XML_PARSE_NOWARNING,
                                         ffi.C.XML_PARSE_NONET)

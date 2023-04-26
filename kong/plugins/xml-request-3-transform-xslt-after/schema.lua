@@ -9,7 +9,7 @@ return {
     { config = {
         type = "record",
         fields = {
-          { xsltTransform = { type = "string", required = true }, },
+          { xsltTransformAfter = { type = "string", required = true }, },
         },
     }, },
   },

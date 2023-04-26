@@ -15,7 +15,7 @@ function plugin:access(plugin_conf)
   local soapEnvelope = kong.request.get_raw_body()
 
   -- Apply XLST Transformation
-  local soapEnvelope_transformed, errMessage = xmlgeneral.XSLTransform(plugin_conf, soapEnvelope, plugin_conf.xsltTransform)
+  local soapEnvelope_transformed, errMessage = xmlgeneral.XSLTransform(plugin_conf, soapEnvelope, plugin_conf.xsltTransformBefore)
 
   if errMessage ~= nil then
     -- Return a Fault code to Client
@@ -30,15 +30,5 @@ function plugin:access(plugin_conf)
   kong.service.request.set_raw_body(soapEnvelope_transformed)
 
 end
---[[
-function plugin:header_filter(plugin_conf)
-  kong.response.clear_header("Content-Length")
-end
 
-function plugin:body_filter(plugin_conf)
-  local soapEnvelope = kong.service.response.get_raw_body()
-  kong.log.notice("soapEnvelope: " .. soapEnvelope)
-  kong.response.set_raw_body("Prout")
-end
-]]
 return plugin

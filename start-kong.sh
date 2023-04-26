@@ -9,14 +9,14 @@ docker rm -f kong-gateway-lua-xml-handling >/dev/null
 docker run -d --name kong-gateway-lua-xml-handling \
 --network=kong-net \
 --link kong-database-lua-xml-handling:kong-database-lua-xml-handling \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-1-transform-xslt-before,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-1-transform-xslt-before \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-2-validate-xsd,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-2-validate-xsd \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-3-transform-xslt-after,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-3-transform-xslt-after \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-request-4-route-by-xpath,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-4-route-by-xpath \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-response-1-transform-xslt-before,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-1-transform-xslt-before \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-response-2-validate-xsd,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-2-validate-xsd \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/xml-response-3-transform-xslt-after,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-3-transform-xslt-after \
---mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-lua-xml-handling/kong/plugins/lua-xml-handling-lib,destination=/usr/local/share/lua/5.1/kong/plugins/lua-xml-handling-lib \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-request-1-transform-xslt-before,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-1-transform-xslt-before \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-request-2-validate-xsd,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-2-validate-xsd \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-request-3-transform-xslt-after,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-3-transform-xslt-after \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-request-4-route-by-xpath,destination=/usr/local/share/lua/5.1/kong/plugins/xml-request-4-route-by-xpath \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-response-1-transform-xslt-before,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-1-transform-xslt-before \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-response-2-validate-xsd,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-2-validate-xsd \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/xml-response-3-transform-xslt-after,destination=/usr/local/share/lua/5.1/kong/plugins/xml-response-3-transform-xslt-after \
+--mount type=bind,source=/Users/jeromeg/Documents/Kong/Tips/kong-plugin-setof-lua-xml-handling/kong/plugins/lua-xml-handling-lib,destination=/usr/local/share/lua/5.1/kong/plugins/lua-xml-handling-lib \
 -e "KONG_DATABASE=postgres" \
 -e "KONG_PG_HOST=kong-database-lua-xml-handling" \
 -e "KONG_PG_USER=kong" \
